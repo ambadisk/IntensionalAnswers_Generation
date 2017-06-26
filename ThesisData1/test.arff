@@ -1,0 +1,5 @@
+@relation user_preference
+@attribute 'interest' string
+@attribute 'class' {businessman,tourist}
+@data
+road,?

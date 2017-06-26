@@ -1,0 +1,23 @@
+@relation user_preference
+@attribute 'interest' string
+@attribute 'class' { tourist,businessman }
+@data
+
+gdp,businessman
+road,businessman
+border,businessman
+city,businessman
+state,businessman
+gdp,businessman
+road,businessman
+border,businessman
+city,businessman
+state,businessman
+city,tourist
+lake,tourist
+mountain,tourist
+river,tourist
+city,tourist
+lake,tourist
+mountain,tourist
+river,tourist
