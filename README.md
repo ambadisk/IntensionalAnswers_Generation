@@ -3,4 +3,7 @@ This is an approach for computing intensional answers given a set of extensional
 
 
 
-Please make sure to add "stanford-corenlp-3.7.0-models.JAR" in the lib folder.
+Please make sure to add "stanford-corenlp-3.7.0-models.JAR" in the lib folder before you compile.
+
+
+Source to download the above jar file: https://stanfordnlp.github.io/CoreNLP/
