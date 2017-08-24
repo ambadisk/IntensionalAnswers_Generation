@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.stanford.nlp.graph.Graph;
+import org.jgrapht.DirectedGraph;
+
 import model.AttributesStates;
 import model.DBData;
 import model.dbObject.State;
@@ -23,15 +24,18 @@ import java.lang.String;
 import util.DBConnector;
 import weka.core.stopwords.Rainbow;
 
+import org.jgrapht.*;
+import org.jgrapht.graph.ClassBasedEdgeFactory;
+import org.jgrapht.graph.DirectedMultigraph;
 public class ClauseGenerator {
 
 
 
 
 	
-	public  Graph<String, String> constructClause( String result){
+	public  List<ClauseData> constructClause( String result){
 		
-		Graph<String, String> raw_clausedata= null;
+		List <ClauseData> raw_clausedata= null;
 		System.out.println("main Attribute = "+KnowledgeBase.mainatts_KB);
 		KnowledgeBase kb= new KnowledgeBase();
 		

@@ -18,7 +18,7 @@ public class AnswerGenerator {
 		String answer = "";
 
 		if (results == null || results.isEmpty()) {
-			answer = "There are no " + nouns.get(0) + (!properNoun.isEmpty() ? (" in " + properNoun) : "") + ".";
+		answer = "There are no " + nouns.get(0) + (!properNoun.isEmpty() ? (" in " + properNoun) : "") + ".";
 		}
 
 		else if (Verb.contains("passing")) {

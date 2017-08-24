@@ -224,7 +224,6 @@ public class SampleMainClass {
 		
 		
 		
-		//
 		questions.add("what are the neighbouring states for California");//done
 		//questions.add("which rivers pass through California");
 		//questions.add("Which roads are passing through to California");

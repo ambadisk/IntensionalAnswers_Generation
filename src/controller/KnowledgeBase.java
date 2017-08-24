@@ -14,12 +14,14 @@ import java.util.Set;
 
 import com.mysql.jdbc.ResultSetMetaData;
 
-import edu.stanford.nlp.graph.DirectedMultiGraph;
-import edu.stanford.nlp.graph.Graph;
+//import edu.stanford.nlp.graph.DirectedMultiGraph;
+//import edu.stanford.nlp.graph.Graph;
 import graph.Node;
 import model.DBData;
 import util.DBConnector;
-
+import org.jgrapht.*;
+import org.jgrapht.graph.ClassBasedEdgeFactory;
+import org.jgrapht.graph.DirectedMultigraph;
 
 public class KnowledgeBase {
 	static String mainatts_KB;
@@ -37,10 +39,11 @@ public class KnowledgeBase {
 	all_table_names.add("state");
    	}
 	
-	public  Graph<String, String> getid_table(String result) throws SQLException {
+	public  List<ClauseData> getid_table(String result) throws SQLException {
 		//Map<String, ArrayList<String>> clausedata = new HashMap <String, ArrayList<String>>();
-		Graph <String, String> clausedata = new DirectedMultiGraph<>();			
-				
+		//Graph <String, String> clausedata = new DirectedMultiGraph<>();			
+		List<ClauseData> clausedata =   new ArrayList<ClauseData>();
+
 				
 		if(mainatts_KB.endsWith("Name")){
 			mainatts_KB = mainatts_KB.replace("Name", "Id");
@@ -75,11 +78,11 @@ public class KnowledgeBase {
 		String sql= null;
 		  
 		if(tn.equals("border")){
-			sql= "select BorderId,BorderName,StateId,StateName from mythesis."+tn+" where "+mainatts_KB+" =  "+id_tofetch ;
+			sql= "select BorderId,BorderName,StateId from mythesis."+tn+" where "+mainatts_KB+" =  "+id_tofetch ;
 			 //sql =  "select * from information_schema.columns where table_schema ='mythesis' and table_name= '"+tn+"' and column_name= '"+mainatts_KB+"'";
 		}
 			else if(tn.equals("state")){
-				sql="select StateId,StateName,StateCapital,Totalpopulation,Area,GDP,Location from mythesis."+tn+" where "+mainatts_KB+" = "+id_tofetch; // sql="IF EXISTS(Select StateId,StateName,StateCapital,Totalpopulation,Area,GDP,Location from "+ tn +" Where "+mainatts_KB+" = "+id_tofetch+")";
+				sql="select StateId,Totalpopulation,Area,GDP,Location from mythesis."+tn+" where "+mainatts_KB+" = "+id_tofetch; // sql="IF EXISTS(Select StateId,StateName,StateCapital,Totalpopulation,Area,GDP,Location from "+ tn +" Where "+mainatts_KB+" = "+id_tofetch+")";
 			}
 			else if(tn.equals("city")){
 				sql="select StateId,CityName,CityId,TotalPopulation,GDP from mythesis."+tn+" where "+mainatts_KB+" = "+id_tofetch; // and exists (select * from information_schema.columns where table_schema ='mythesis' and table_name='"+tn+ "' and column_name= '"+mainatts_KB+"')"; 
@@ -114,14 +117,14 @@ public class KnowledgeBase {
 
 	   
 	    
-	  public static Graph<String, String> loadClauseData(int id_tofetch, String result_name ){ 
-		  Graph<String, String> data = new DirectedMultiGraph<String, String>() ;
+	  public static List<ClauseData> loadClauseData(int id_tofetch, String result_name ){ 
+		  List<ClauseData> data =   new ArrayList<ClauseData>();
+		 // Graph<String, String> data = new DirectedMultiGraph<String, String>() ;
 		  KnowledgeBase kb = new KnowledgeBase();		  
 		  int flag=0;
 		try {	
 		
 		  for (String tn : kb.all_table_names){
-			 //System.out.println(mainatts_KB);
 			 String check_query= "SELECT CASE WHEN EXISTS (select * from information_schema.columns where table_schema ='mythesis' and table_name= '"+tn+"' and column_name= '"+mainatts_KB+"') THEN 'yes'  else 'no' end ";
 			 ResultSet rs_check = kb.query_executed(check_query);
 			 flag = 0;
@@ -140,7 +143,8 @@ public class KnowledgeBase {
 		
 			ResultSet rs =  kb.query_executed(kb.querytypes(tn, id_tofetch));	
 		
-			kb.sortQueryAnswer(rs, result_name, data);
+			data = kb.sortQueryAnswer(rs, result_name, data);
+			//System.out.println(data);
 		    
 			
 							
@@ -171,10 +175,11 @@ public class KnowledgeBase {
 		  
 	  }
 	  
-	  public Graph<String, String> sortQueryAnswer(ResultSet rs,String result_name, Graph<String, String> data){
+	  public List<ClauseData> sortQueryAnswer(ResultSet rs,String result_name, List<ClauseData> data){
+		  
 		  //Graph<String, String> graph = data;
-		
-		 
+	  //DirectedGraph<String, RelationshipEdge> graph = new DirectedMultigraph<String, RelationshipEdge>(new ClassBasedEdgeFactory<String, RelationshipEdge>(RelationshipEdge.class)); 
+		 ClauseData cd = null;
 		  
 		  try {
 			while (rs.next()){
@@ -184,16 +189,22 @@ public class KnowledgeBase {
 						  String colname = rsmd.getColumnLabel(i);					  
 						  int type = rsmd.getColumnType(i);
 						  if (type == Types.VARCHAR || type == Types.CHAR) {
-							  //System.out.println(rs.getString(colname));
-                                data.add( result_name, rs.getString(colname), colname);
+							 //data.addVertex(colname);
+							 //data.addVertex(rs.getString(colname));
+							 //data.addEdge(colname, rs.getString(colname), new String(colname));
+							 //data.addEdge(result_name, result_name, new String<String>(result_name,rs.getString(colname), )); 
+                            if(result_name.equals(rs.getString(colname))){
+                            	data.add(new ClauseData(colname, result_name));
+                            }else{
+                            	data.add(new ClauseData(colname, result_name, rs.getString(colname)));
+                            }
+							 
+                              
+                                    
 							 
 						  }
-						  else if(type == Types.DOUBLE || type == Types.FLOAT ){
-							  				  
-						  }else if (type == Types.INTEGER){
-							
-							 
-						  }
+						 
+						  
 						   
 					  }
 					
@@ -202,7 +213,7 @@ public class KnowledgeBase {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		 
+		        
 	            return data;
 		  
 					 
